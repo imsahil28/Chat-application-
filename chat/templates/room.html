@@ -1,0 +1,82 @@
+{% extends "base.html"%}
+
+    {% block content %}
+<!doctype html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+    <title>Chat App</title>
+
+</head>
+<body>
+    <div class="card">
+        <div class="card-header">
+            <h1 style="background-color: Gray; color: black;">Hello, Welcome to the chat room! {{ room_name }}</h1>
+        </div>
+    </div>
+    <div 
+        class="chat_item_container"
+        id="id_chat_item_container"
+        style="font-size: 20px;"
+    >
+        {% if messages %}
+            {% for message in messages %}
+                {{ message.user.username }}: {{ message.content }}<br>
+            {% endfor %}
+        {% else %}
+            <p>No messages yet. Start chatting!</p>
+        {% endif %}
+    </div>
+
+    <br>
+    <form id="message-form">
+        <input type="text" id="message-input">
+        <button type="submit" id="send-button">Send</button>
+    </form>
+</body>
+
+</html>
+
+{% if request.user.is_authenticated %}
+    <center>Logout the chat Page <a href="{% url 'login' %}">Logout</a></center>
+{% endif %}
+
+{{ slug|json_script:"room_slug" }}
+{{ room_name|json_script:"room_name" }}
+
+<script>
+    const roomSlug = JSON.parse(document.getElementById('room_slug').textContent);
+    const roomName = JSON.parse(document.getElementById('room_name').textContent);
+    const chatSocket = new WebSocket("ws://" + window.location.host + "/ws/" + roomSlug + '/');
+    chatSocket.onopen = function (e) {
+        console.log("The connection was set up successfully!");
+    };
+    chatSocket.onclose = function (e) {
+        console.log("Something unexpected happened!");
+    };
+    document.querySelector("#message-input").focus();
+    document.querySelector("#message-input").onkeyup = function (e) {
+        if (e.keyCode === 13) {
+            document.querySelector("#send-button").click();
+        }
+    };
+    document.querySelector("#send-button").onclick = function (e) {
+        var messageInput = document.querySelector("#message-input").value;
+        chatSocket.send(JSON.stringify({message: messageInput, username: "{{ request.user.username }}", room_name: roomName}));
+    };
+    chatSocket.onmessage = function (e) {
+        const data = JSON.parse(e.data);
+        var div = document.createElement("div");
+        div.innerHTML = data.username + ": " + data.message;
+        document.querySelector("#message-input").value = "";
+        document.querySelector("#chat-container").appendChild(div);
+    };
+</script>
+
+{% endblock %}

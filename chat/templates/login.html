@@ -1,0 +1,77 @@
+{% extends "base.html"%}
+
+    {% block content %}
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WELCOME TO OUR CHATTY</title>WELCOME TO OUR CHATTY APP
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        background-image: url('sports_running_shoes_8392x5352.jpg');  
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        background-color:MediumSeaGreen;
+    }
+</style>
+</head>
+<body>
+    
+    <div class="global-container">
+        
+       <h1> Log in to Chatty 💬<br>
+            Chat, Snap💛,video call📷 your friends. <br>
+            Watch Stories and Spotlight, all from your computer.<br>
+            </h1>
+    
+        <div class="card login-form">
+        <div class="card-body">
+            <h3 class="card-title text-center">Start chatting😍</h3>
+            {% if messages %}
+
+            {% for message in messages %}
+            <div class="alert alert-info">
+                {{ message }}
+            </div>
+            {% endfor %}
+      
+        {% endif %}
+            <div class="card-text">
+                <!--
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">Incorrect username or password.</div> -->
+                <form method="post" enctype='multipart/form-data' >
+                    {% csrf_token %}
+                    <!-- to error: add class "has-danger" -->
+                    <div class="form-group">
+                        <label for="exampleInputEmail1">User</label>
+                        <input type="text" name="username" class="form-control form-control-sm" id="exampleInputEmail1" aria-describedby="emailHelp">
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleInputPassword1">Password</label>
+                        
+                        <input type="password" name="password" class="form-control form-control-sm" id="exampleInputPassword1">
+                        <a href="#" style="float:right;font-size:12px;">Forgot password?</a>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">Sign in</button>
+                    
+                    <div class="sign-up">
+                        Don't have an account? <a href="{% url 'register_user' %}">Create One</a> 
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    </div>
+    
+
+   </body>
+</html>
+
+{% endblock %}
